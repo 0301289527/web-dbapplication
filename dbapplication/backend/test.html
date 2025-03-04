@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Database Test</title>                
+    <title>Database Testing</title>
+</head>
+<body>
+    <h1>Database Testing</h1>
+
+    <h2>Adding Users</h2>
+    <input type="text" id="name" placeholder="Name">
+    <input type="email" id="email" placeholder="Email">
+    <button onclick="addUser()">Add</button>
+
+    <h2>User List</h2>
+    <button onclick="getUsers()">Get User</button>
+    <ul id="userList"></ul>
+
+    <script>
+        async function addUser() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+
+            const res = await fetch('/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email })
+            });
+
+            const data = await res.json();
+            alert('User added successfully: ' + JSON.stringify(data));
+        }
+
+        async function getUsers() {
+            const res = await fetch('/users');
+            const users = await res.json();
+
+            const list = document.getElementById('userList');
+            list.innerHTML = '';
+            users.forEach(user => {
+                const li = document.createElement('li');
+                li.textContent = `${user.id}: ${user.name} (${user.email}) `;
+                li.innerHTML += `<button onclick="deleteUser(${user.id})">delete</button>`;
+                list.appendChild(li);
+            });
+        }
+
+        async function deleteUser(id) {
+            await fetch(`/users/${id}`, { method: 'DELETE' });
+            getUsers();
+        }
+    </script>
+</body>
+</html>
